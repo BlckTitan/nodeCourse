@@ -6,9 +6,9 @@ app.use(express.json());
 
 
 const COURSES = [
-    {id: 1, course: 'Maths'},
-    {id: 2, course: 'English'},
-    {id: 3, course: 'Biology'}
+    {id: 1, name: 'Maths'},
+    {id: 2, name: 'English'},
+    {id: 3, name: 'Biology'}
 ]
 
 
@@ -53,6 +53,7 @@ app.post('/api/courses', (req, res) => {
         name: Joi.string().min(3).required()
     })
 
+
     const RESULT = schema.validate(req.body)
     
 
@@ -70,6 +71,32 @@ app.post('/api/courses', (req, res) => {
     COURSES.push(COURSE);
     res.send(COURSE);
 })
+
+//put request
+
+app.put('/api/courses/:id', (req, res) => {
+    const COURSE = COURSES.find((foundCourse) => foundCourse.id === parseInt(req.params.id));
+    if(!COURSE) return res.status(404).send('Searched course not found')
+
+    const RESULT = validateRequest(req.body)
+    if(RESULT.error){
+        res.status(400).send(RESULT.error.details[0].message)
+        return;
+    }
+    
+    COURSE.name = req.body.name
+    res.send(COURSE)
+
+})
+
+
+const validateRequest = (request) => {
+    const SCHEMA = Joi.object({
+        name: Joi.string().min(3).required()
+    })
+
+    return SCHEMA.validate(request)
+}
 
 const port = process.env.PORT || 5000;
 
