@@ -59,8 +59,8 @@ app.post('/api/courses', (req, res) => {
 
     if(RESULT.error){
         //400 Bad request
-        res.status(400).send(RESULT.error.details[0].message);
-        return
+       return res.status(400).send(RESULT.error.details[0].message);
+        
     }
 
     const COURSE = {
@@ -80,8 +80,8 @@ app.put('/api/courses/:id', (req, res) => {
 
     const RESULT = validateRequest(req.body)
     if(RESULT.error){
-        res.status(400).send(RESULT.error.details[0].message)
-        return;
+        return res.status(400).send(RESULT.error.details[0].message)
+        
     }
     
     COURSE.name = req.body.name
@@ -89,6 +89,16 @@ app.put('/api/courses/:id', (req, res) => {
 
 })
 
+app.delete('/api/courses/:id', (req, res) => {
+    const COURSE = COURSES.find((foundCourse) => foundCourse.id === parseInt(req.params.id));
+    if(!COURSE) return res.status(404).send(`Course with id ${req.params.id} not found`); 
+
+    const INDEX = COURSES.indexOf(COURSE)
+    COURSES.splice(INDEX, 1)
+
+    res.send(COURSE);
+
+})
 
 const validateRequest = (request) => {
     const SCHEMA = Joi.object({
