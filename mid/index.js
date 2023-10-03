@@ -13,6 +13,11 @@ app.use(logger);
 app.use(morgan('tiny'));
 app.use(helmet());
 
+if(app.get('env') === 'development'){
+    app.use(morgan('tiny'))
+    console.log('  ')
+}
+
 const GENRES = [
     {id: 1, name: "Horror"},
     {id: 2, name: "Comedy"},
