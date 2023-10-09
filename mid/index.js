@@ -1,6 +1,7 @@
 const morgan = require('morgan')
 const helmet = require('helmet')
 const logger = require('./logger')
+const config = require('config')
 const auth = require('./auth');
 const express = require('express')
 const app = express();
@@ -15,7 +16,7 @@ app.use(helmet());
 
 if(app.get('env') === 'development'){
     app.use(morgan('tiny'))
-    console.log('  ')
+    console.log('Morgan enabled')
 }
 
 const GENRES = [
@@ -26,6 +27,10 @@ const GENRES = [
     {id: 5, name: "Sci-Fi"},
     {id: 6, name: "Drama"}
 ]
+
+console.log(`Application name: ${config.get('name')}`)
+console.log(`Mail server: ${config.get('mail.host')}`)
+console.log(`Mail password: ${config.get('mail.password')}`)
 
 app.get('/', (req, res) => {
     console.log('serving...')
