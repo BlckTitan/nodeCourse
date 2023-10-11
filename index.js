@@ -1,43 +1,39 @@
-const startupDebugger = require('debug')('app:startup')
-const morgan = require('morgan')
-const helmet = require('helmet')
-const logger = require('./logger')
-const config = require('config')
-const auth = require('./auth');
-const express = require('express')
-const app = express();
-const genre = require('./routes/genre')
-const course = require('./routes/course')
+const STARTUP_DEBUGGER = require('debug')('APP:startup')
+const MORGAN = require('morgan')
+const HELMET = require('helmet')
+const LOGGER = require('./middleware/logger')
+const CONFIG = require('config')
+const AUTH = require('./auth');
+const EXPRESS = require('express')
+const APP = EXPRESS();
+const GENRE = require('./routes/genre')
+const COURSE = require('./routes/course')
+const home = require('./routes/home')
 
+APP.use(EXPRESS.json())
+APP.use(EXPRESS.urlencoded({extended: true}))
+APP.use(EXPRESS.static('./public'))
+APP.use(AUTH);
+APP.use(LOGGER);
+APP.use(MORGAN('tiny'));
+APP.use(HELMET());
+APP.use('/api/genre', GENRE)
+APP.use('/api/course', COURSE)
+APP.use('/', home)
 
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
-app.use(express.static('./public'))
-app.use(auth);
-app.use(logger);
-app.use(morgan('tiny'));
-app.use(helmet());
-app.use('/api/genre', genre)
-app.use('/api/course', course)
-
-if(app.get('env') === 'development'){
-    app.use(morgan('tiny'))
-    startupDebugger('Morgan enabled')
+if(APP.get('env') === 'development'){
+    APP.use(MORGAN('tiny'))
+    STARTUP_DEBUGGER('Morgan enabled')
 }
 
 //templating engine
-app.set('view engine', 'pug')
-app.set('views', './views')
+APP.set('view engine', 'pug')
+APP.set('views', './views')
 
-// console.log(`Application name: ${config.get('name')}`)
-// console.log(`Mail server: ${config.get('dev-mail.host')}`)
-// console.log(`Mail password: ${config.get('email.password')}`)  
-
-app.get('/', (req, res) => {
-    // console.log('serving...')
-    res.render('index', {title: "My express App", message: "HTML Markup"})
-})
+// console.log(`APPlication name: ${CONFIG.get('name')}`)
+// console.log(`Mail server: ${CONFIG.get('dev-mail.host')}`)
+// console.log(`Mail password: ${CONFIG.get('email.password')}`)  
 
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Listening on ${PORT}`))
+APP.listen(PORT, () => console.log(`Listening on ${PORT}`))
