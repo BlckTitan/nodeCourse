@@ -1,8 +1,6 @@
 const Joi = require('joi')
 const express = require('express');
-const app = express();
-
-app.use(express.json());
+const router = express.Router();
 
 
 const COURSES = [
@@ -10,33 +8,13 @@ const COURSES = [
     {id: 2, name: 'English'},
     {id: 3, name: 'Biology'}
 ]
-
-
-//sending http requests
-
-app.get('/', (req, res ) => {
-    res.send('Hello World')
-})
-
-app.get('/api/again', (req, res) => {
-    res.send([1, 2, 3, 4, 5])
-})
-
-app.get('/api/blog/:month/:year', (req, res) => {
-    res.send(req.params)
-})
-
-app.get('/api/posts/:month/:year', (req, res) => {
-    res.send(req.query)
-})
-
-app.get('/api/courses', (req, res) => {
+//get all courses
+router.get('/', (req, res) => {
     res.send(COURSES)
 })
 
-//handling gete requests
-
-app.get('/api/courses/:id', (req, res) => {
+//handling get requests
+router.get('/:id', (req, res) => {
     const COURSE_MATCH = COURSES.find((foundCourse) => foundCourse.id === parseInt(req.params.id));
     if(!COURSE_MATCH){
         res.status(404).send('The course with the given ID was not found...')
@@ -46,7 +24,7 @@ app.get('/api/courses/:id', (req, res) => {
 })
 
 //post request
-app.post('/api/courses', (req, res) => {
+router.post('/', (req, res) => {
 
     //validating requests using Joi
     const schema = Joi.object({
@@ -74,7 +52,7 @@ app.post('/api/courses', (req, res) => {
 
 //put request
 
-app.put('/api/courses/:id', (req, res) => {
+router.put('/:id', (req, res) => {
     const COURSE = COURSES.find((foundCourse) => foundCourse.id === parseInt(req.params.id));
     if(!COURSE) return res.status(404).send('Searched course not found')
 
@@ -89,7 +67,7 @@ app.put('/api/courses/:id', (req, res) => {
 
 })
 
-app.delete('/api/courses/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
     const COURSE = COURSES.find((foundCourse) => foundCourse.id === parseInt(req.params.id));
     if(!COURSE) return res.status(404).send(`Course with id ${req.params.id} not found`); 
 
@@ -108,6 +86,4 @@ const validateRequest = (request) => {
     return SCHEMA.validate(request)
 }
 
-const port = process.env.PORT || 5000;
-
-app.listen(port, () => console.log(`Listening on port ${port}...`))
+module.exports = router

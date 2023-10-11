@@ -1,9 +1,5 @@
-const Joi = require('joi');
 const express = require('express')
-const app = express();
-
-
-app.use(express.json())
+const router = express.Router()
 
 const GENRES = [
     {id: 1, name: "Horror"},
@@ -14,18 +10,19 @@ const GENRES = [
     {id: 6, name: "Drama"}
 ]
 
-app.get('/api/genre', (req, res) => {
+
+router.get('/', (req, res) => {
     res.send(GENRES)
 })
 
-app.get('/api/genre/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     const MATCH = GENRES.find((foundGenre) => foundGenre.id === parseInt(req.params.id))
     
     if(!MATCH) return res.status(404).send('Requested genre not found')
     res.send(MATCH)
 })
 
-app.post('/api/genre', (req, res) => {
+router.post('/', (req, res) => {
     //validation
     const RESULT = validateGenre(req.body)
     if(RESULT.error){
@@ -42,7 +39,7 @@ app.post('/api/genre', (req, res) => {
 
 })
 
-app.put('/api/genre/:id', (req, res) => {
+router.put('/:id', (req, res) => {
     //validation
     const RESULT = validateGenre(req.body)
     if(RESULT.error){
@@ -60,7 +57,7 @@ app.put('/api/genre/:id', (req, res) => {
 
 })
 
-app.delete('/api/genre/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
     
     const MATCH = GENRES.find((foundGenre) => foundGenre.id === parseInt(req.params.id))
     
@@ -82,5 +79,5 @@ const validateGenre = (request) => {
     return RESULT = SCHEMA.validate(request)
 }
 
-const  port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}`));
+
+module.exports = router;
