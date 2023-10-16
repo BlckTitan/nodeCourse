@@ -26,6 +26,22 @@ const COURSE_SCHEMA = new MONGOOSE.Schema({
     isPublished: Boolean
 })
 
+const COURSE_MODEL = MONGOOSE.model('Course', COURSE_SCHEMA)//returns a class
+
+const createCourse = async () =>{
+
+    const COURSE = new COURSE_MODEL({
+        name: 'Angular Course',
+        author: 'Eze',
+        tags: ['Angular', 'Backend'],
+        isPublished: true
+    })//creating an object out of the COURSE_MODEL class
+
+    const RESULT = await COURSE.save()
+    console.log(RESULT)
+}
+
+createCourse()
 // APP.use(EXPRESS.json())
 // APP.use(EXPRESS.urlencoded({extended: true})) 
 // APP.use(EXPRESS.static('./public'))
