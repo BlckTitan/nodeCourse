@@ -41,7 +41,17 @@ const createCourse = async () =>{
     console.log(RESULT)
 }
 
-createCourse()
+const getCourses = async () => {
+    const COURSES = await COURSE_MODEL.find({author: 'Eze', isPublished: true})
+    .limit(10)//number of results returned
+    .sort({name: 1})//sort name by ascending order (1 => ascending order, -1 => descending order)
+    .select({name: 1, tags: 1}) //return only name and tags 
+    console.log(COURSES)
+}
+
+getCourses()
+
+// createCourse()
 // APP.use(EXPRESS.json())
 // APP.use(EXPRESS.urlencoded({extended: true})) 
 // APP.use(EXPRESS.static('./public'))
