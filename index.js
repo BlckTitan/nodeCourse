@@ -12,28 +12,18 @@
 
 //working with mongoDB
 const MONGOOSE = require('mongoose');
+const COURSE_MODEL = require('./model/courseModel');
 
 MONGOOSE.connect('mongodb://127.0.0.1/mongoLesson')
 .then(() => console.log('Connected to database'))
 .catch((err) => console.error('could not connect to database', err))
 
-
-const COURSE_SCHEMA = new MONGOOSE.Schema({
-    name: String,
-    author: String,
-    tags: [String],
-    date: {type: Date, default: Date.now},
-    isPublished: Boolean
-})
-
-const COURSE_MODEL = MONGOOSE.model('Course', COURSE_SCHEMA)//returns a class
-
 const createCourse = async () =>{
 
     const COURSE = new COURSE_MODEL({
-        name: 'Angular Course',
+        name: 'Vue Course',
         author: 'Eze',
-        tags: ['Angular', 'Backend'],
+        tags: ['Express', 'Frontend'],
         isPublished: true
     })//creating an object out of the COURSE_MODEL class
 
@@ -49,9 +39,50 @@ const getCourses = async () => {
     console.log(COURSES)
 }
 
-getCourses()
+//QUERY FRIST UPDATE APPROACH
 
+
+// const updateCourses = async (id) => {
+//     const COURSES = await COURSE_MODEL.findById(id);
+
+//     if(!COURSES) return console.log('query failed');
+
+//     COURSES.set({
+//         isPublished: true,
+//         author: 'Mr Victor'
+//     })
+
+//     const RESULT = await COURSES.save()
+//     console.log(RESULT)
+// }
+
+
+// UPDATE FIRST OPERATION
+
+
+const updateCourses = async (id) => {
+    const RESULT = await COURSE_MODEL.findByIdAndUpdate({_id: id}, {
+        $set: {
+            author: 'Eze',
+            isPublished: false
+        }
+    }, {new: true});
+    console.log(RESULT)
+}
+
+// DELETE OPERATION
+
+const deleteCourses = async (id) => {
+    const RESULT = await COURSE_MODEL.deleteOne({_id: id})
+
+    console.log(RESULT)
+}
+
+deleteCourses("653231a62ea08ca5ca45548a")
+// updateCourses("653231a62ea08ca5ca45548a")
+// getCourses()
 // createCourse()
+
 // APP.use(EXPRESS.json())
 // APP.use(EXPRESS.urlencoded({extended: true})) 
 // APP.use(EXPRESS.static('./public'))
