@@ -1,83 +1,96 @@
+const Joi = require('joi')
 const express = require('express')
 const router = express.Router()
-
-const GENRES = [
-    {id: 1, name: "Horror"},
-    {id: 2, name: "Comedy"},
-    {id: 3, name: "Action"},
-    {id: 4, name: "Romance"},
-    {id: 5, name: "Sci-Fi"},
-    {id: 6, name: "Drama"}
-]
+const GENRE_MODEL = require('../model/genreModel')
 
 
-router.get('/', (req, res) => {
-    res.send(GENRES)
+router.get('/', async (req, res) => {
+    const GENRE = await GENRE_MODEL.find()
+    .sort('name')
+    res.send(GENRE)
 })
 
-router.get('/:id', (req, res) => {
-    const MATCH = GENRES.find((foundGenre) => foundGenre.id === parseInt(req.params.id))
+router.get('/:id', async (req, res) => {
+    const GENRE = await GENRE_MODEL.findById(req.params.id)
     
-    if(!MATCH) return res.status(404).send('Requested genre not found')
-    res.send(MATCH)
+    if(!GENRE) return res.status(404).send('Requested genre not found')
+
+    res.send(GENRE)
 })
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     //validation
     const RESULT = validateGenre(req.body)
+
     if(RESULT.error){
         return res.status(400).send(RESULT.error.details[0].message)
     }
 
-    const NEW_GENRE = {
-        id: GENRES.length + 1,
-        name: req.body.name
-    }
+    let newGenre = new GENRE_MODEL({
+        name: req.body.name,
+        tags: req.body.tags
+    })
 
-    GENRES.push(NEW_GENRE);
-    res.send(NEW_GENRE)
+    try{
+        newGenre = await newGenre.save();
+        res.send(newGenre)
+    } catch(err){
+        console.log(err)
+    }
 
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
+
     //validation
     const RESULT = validateGenre(req.body)
+
     if(RESULT.error){
         return res.status(400).send(RESULT.error.details[0].message)
     }
 
-    const MATCH = GENRES.find((foundGenre) => foundGenre.id === parseInt(req.params.id))
+    let updatedGenre = await GENRE_MODEL.findByIdAndUpdate(req.params.id)
     
-    if(!MATCH){
+    if(!updatedGenre){
         return res.status(404).send('Genre does not exist');
     }
-    MATCH.name = req.body.name
+    else{
+        updatedGenre.set({
+            name: req.body.name,
+            tags: req.body.tags
+        })
+    }
 
-    res.send(MATCH)
+    try{
+        updatedGenre = await updatedGenre.save()
+        res.send(updatedGenre)
+    }
+    catch(err){
+        console.log(err)
+    }
 
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     
-    const MATCH = GENRES.find((foundGenre) => foundGenre.id === parseInt(req.params.id))
+    const DELETED_GENRE = await GENRE_MODEL.findByIdAndRemove({_id: req.params.id})
     
-    if(!MATCH){
+    if(!DELETED_GENRE){
         return res.status(404).send('Genre does not exist');
     }
-    
-    const INDEX = GENRES.indexOf(MATCH)
-    GENRES.splice(INDEX, 1)
 
-    res.send(MATCH)
+    res.send(DELETED_GENRE)
 
 })
 
 const validateGenre = (request) => {
     const SCHEMA = Joi.object({
-        name: Joi.string().min(3).required()
+        name: Joi.string().min(3).required(),
+        tags: Joi.array()
     })
     return RESULT = SCHEMA.validate(request)
 }
+
 
 
 module.exports = router;

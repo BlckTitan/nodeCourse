@@ -6,13 +6,14 @@
 // const AUTH = require('./auth');
 const EXPRESS = require('express')
 const APP = EXPRESS();
-// const GENRE = require('./routes/genre')
+const GENRE = require('./routes/genre')
 const COURSE = require('./routes/course')
 // const home = require('./routes/home')
 
 
 APP.use(EXPRESS.json())
 APP.use('/api/course', COURSE)
+APP.use('/api/genre', GENRE)
 
 //working with mongoDB
 const MONGOOSE = require('mongoose');
