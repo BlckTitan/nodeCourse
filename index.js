@@ -4,11 +4,15 @@
 // const LOGGER = require('./middleware/logger')
 // const CONFIG = require('config')
 // const AUTH = require('./auth');
-// const EXPRESS = require('express')
-// const APP = EXPRESS();
+const EXPRESS = require('express')
+const APP = EXPRESS();
 // const GENRE = require('./routes/genre')
-// const COURSE = require('./routes/course')
+const COURSE = require('./routes/course')
 // const home = require('./routes/home')
+
+
+APP.use(EXPRESS.json())
+APP.use('/api/course', COURSE)
 
 //working with mongoDB
 const MONGOOSE = require('mongoose');
@@ -27,8 +31,12 @@ const createCourse = async () =>{
         isPublished: true
     })//creating an object out of the COURSE_MODEL class
 
-    const RESULT = await COURSE.save()
-    console.log(RESULT)
+    try{
+        const RESULT = await COURSE.save()
+        console.log(RESULT)
+    } catch(err){
+        console.log(err.message)
+    }
 }
 
 const getCourses = async () => {
@@ -36,6 +44,8 @@ const getCourses = async () => {
     .limit(10)//number of results returned
     .sort({name: 1})//sort name by ascending order (1 => ascending order, -1 => descending order)
     .select({name: 1, tags: 1}) //return only name and tags 
+
+    APP.get()
     console.log(COURSES)
 }
 
@@ -52,8 +62,13 @@ const getCourses = async () => {
 //         author: 'Mr Victor'
 //     })
 
-//     const RESULT = await COURSES.save()
-//     console.log(RESULT)
+//     try{
+        //     const RESULT = await COURSES.save()
+        //     console.log(RESULT)
+        // } catch(err){
+        //     console.log(err.message)
+        // }
+
 // }
 
 
@@ -67,7 +82,13 @@ const updateCourses = async (id) => {
             isPublished: false
         }
     }, {new: true});
-    console.log(RESULT)
+
+    // try{
+    //     const RESULT = await COURSE.save()
+    //     console.log(RESULT)
+    // } catch(err){
+    //     console.log(err.message)
+    // }
 }
 
 // DELETE OPERATION
@@ -75,10 +96,10 @@ const updateCourses = async (id) => {
 const deleteCourses = async (id) => {
     const RESULT = await COURSE_MODEL.deleteOne({_id: id})
 
-    console.log(RESULT)
+    //  
 }
 
-deleteCourses("653231a62ea08ca5ca45548a")
+// deleteCourses("653231a62ea08ca5ca45548a")
 // updateCourses("653231a62ea08ca5ca45548a")
 // getCourses()
 // createCourse()
@@ -91,7 +112,6 @@ deleteCourses("653231a62ea08ca5ca45548a")
 // APP.use(MORGAN('tiny'));
 // APP.use(HELMET());
 // APP.use('/api/genre', GENRE)
-// APP.use('/api/course', COURSE)
 // APP.use('/', home)
 
 // if(APP.get('env') === 'development'){
@@ -108,5 +128,5 @@ deleteCourses("653231a62ea08ca5ca45548a")
 // // console.log(`Mail password: ${CONFIG.get('email.password')}`)  
 
 
-// const PORT = process.env.PORT || 3000;
-// APP.listen(PORT, () => console.log(`Listening on ${PORT}`))
+const PORT = process.env.PORT || 3000;
+APP.listen(PORT, () => console.log(`Listening on ${PORT}`))
